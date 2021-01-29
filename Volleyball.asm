@@ -15,3 +15,106 @@ Elastic Collisions and no Caps
 #knockback decay is true -0.051 overall speed
 #calc angle of movement, subtract 0.051 off mag, multiply each individual speed, reapply
 #wall bounce = natural decay first, and then knockback*0.8, 
+
+
+#ct
+op li r3, 0x300 @ $81160270 #alloc'ed size, original size 0x1E8, alloced 0x118 extra (only need 0x100)
+op beq 0x3C @ $81160298 #skip the hook below, original branch 0x38 (functionally identical)
+HOOK @ $811602D0
+{
+    addi r3, r30, 0x200
+    lis r12, 0x8001
+    ori r12, r12, 0x370c
+    mtctr r12
+    bctrl 
+    addi r3, r30, 0x280
+    lis r12, 0x8001
+    ori r12, r12, 0x370C
+    mtctr r12
+    bctrl 
+
+    mr r3, r30
+}
+
+#dt
+HOOK @ $8115FB50
+{
+    addi r3, r30, 0x280
+    li r4, -1
+    lis r12, 0x8001
+    ori r12, r12, 0x3B1C
+    mtctr r12
+    bctrl 
+    addi r3, r30, 0x200
+    li r4, -1
+    lis r12, 0x8001
+    ori r12, r12, 0x3B1C
+    mtctr r12
+    bctrl 
+    
+    mr r3, r30
+}
+
+#to go in the getItemPac function
+HOOK @ $8092F508 
+{
+    cmpwi r6, 0x4B
+    bnelr
+    addi r6, r3, 0x280
+    stw r6, 0(r4)
+    addi r6, r3, 0x200
+    stw r6, 0(r5)
+    blr 
+}
+
+#createObj
+HOOK @ $8115fbB8
+{
+    mr r28, r3
+getItemModels:
+    lis r4, 0x0001
+    subi r0, r4, 2
+    lwz r3, 0x1A0(r3)
+    addi r6, r1, 0xC
+    rlwinm r7, r0, 0, 16, 31
+    li r4, 1
+    li r5, 10001
+    lis r12, 0x8001
+    ori r12, r12, 0x5E14
+    mtctr r12
+    bctrl 
+    cmpwi r3, 0
+    beq getItemPSA
+    lwz r5, 0xC(r1)
+    mr r4, r3
+    addi r3, r28, 0x280
+    li r6, 17
+    lis r12, 0x8001
+    ori r12, r12, 0x4890
+    mtctr r12
+    bctrl 
+getItemPSA:
+    lis r4, 0x0001
+    subi r0, r4, 2
+    lwz r3, 0x1A0(r28)
+    addi r6, r1, 0xC
+    rlwinm r7, r0, 0, 16, 31
+    li r4, 1
+    li r5, 10002
+    lis r12, 0x8001
+    ori r12, r12, 0x5E14
+    mtctr r12
+    bctrl 
+    cmpwi r3, 0
+    beq end
+    lwz r5, 0xC(r1)
+    mr r4, r3
+    addi r3, r28, 0x200
+    li r6, 17
+    lis r12, 0x8001
+    ori r12, r12, 0x4890
+    mtctr r12
+    bctrl 
+end:
+    mr r3, r28
+}
