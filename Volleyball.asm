@@ -1,8 +1,17 @@
 Elastic Collisions and no Caps 
-float 1.0 @ $9102B77C #= wallbounce multiplier horziontal, set to 1
-float 1.0 @ $9102B780 #= wallbounce multiplier vertical, set to 1
-float 1.0 @ $9102B784 #= cieling bounce mult horiz
-float 1.0 @ $9102B788 #= cieling bounce mult horiz
+* 42000000 90000000
+* 0502B77C 3F800000 #= wallbounce multiplier horziontal, set to 1
+* 0502B780 3F800000 #= wallbounce multiplier vertical, set to 1
+* 0502B784 3F800000 #= cieling bounce mult horiz
+* 0502B788 3F800000 #= cieling bounce mult horiz
+* 0502B72C 7f800000 #= vertical max cap = inf
+* 0502B79C 7f800000 #= horizontal max cap = inf
+.RESET
 
-float 0.0 @ $9102b72c #= vertical max cap
-float 0.0 @ $9102b79c #= horizontal max cap
+#melee volleybal mechanics
+
+#max fallspeed = -2.3
+#gravity = -0.051
+#knockback decay is true -0.051 overall speed
+#calc angle of movement, subtract 0.051 off mag, multiply each individual speed, reapply
+#wall bounce = natural decay first, and then knockback*0.8, 
