@@ -16,6 +16,17 @@ Elastic Collisions and no Caps
 #calc angle of movement, subtract 0.051 off mag, multiply each individual speed, reapply
 #wall bounce = natural decay first, and then knockback*0.8, 
 
+Items Added 
+/*
+Things required to add an item to a stage:
+  create()/[stClassInfo] function needs to allocate 0x100 more space per item being alloc'ed
+  __ct()/[stage] needs to alloc two gfArchive objects within the extra space alloc'ed above, one 0x80 in, per item added
+  __dt()/[stage] needs to destroy the gfArchives created above
+  getItemPac()/[stage] need to point rel to read this from within the rel, and write the locations of the two gfArchives to r4 and r5, using r3 as offset 0, and r6 being the item ID to check against
+  createObj()/[stage] needs to check that archives with correct file index existed, and then populate the two gfArchives specified above
+     gfArchive that is stored into r4 in getItemPac is model, into r5 is psa file
+example below is my planned edits to training rooms rel
+*/
 
 #ct
 op li r3, 0x300 @ $81160270 #alloc'ed size, original size 0x1E8, alloced 0x118 extra (only need 0x100)
@@ -53,12 +64,14 @@ HOOK @ $811602D0
 #dt
 HOOK @ $8115FB50
 {
+    #gfArchive at offset 0x280
     addi r3, r30, 0x280
     li r4, -1
     lis r12, 0x8001
     ori r12, r12, 0x3B1C
     mtctr r12
     bctrl 
+    #gfArchive at offset 0x200
     addi r3, r30, 0x200
     li r4, -1
     lis r12, 0x8001
